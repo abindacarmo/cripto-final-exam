@@ -18,21 +18,21 @@ def encrypt_number(m, k=None, p=P, g=G, y=Y):
     if not 0 <= m < p:
         raise ValueError(f"Message number must be between 0 and {p - 1}")
 
-    # Sesuai sumber: 1 <= k <= p-1
+    # Based on the source formula: 1 <= k <= p-1
     if k is None:
         k = randbelow(p - 1) + 1
     elif not 1 <= k <= p - 1:
         raise ValueError(f"k must be between 1 and {p - 1}")
     
     c1 = pow(g, k, p)
-    # Menghitung b = (y^k * m) mod p sesuai rumus (3) di sumber
+    # Compute b = (y^k * m) mod p based on the ElGamal formula.
     c2 = (m * pow(y, k, p)) % p
     return c1, c2
 
 def decrypt_number(cipher_pair, p=P, x=X):
     """Decrypt one ElGamal cipher pair."""
     c1, c2 = cipher_pair
-    # Menghitung (a^x)^-1 mod p sesuai prosedur dekripsi di sumber
+    # Compute (a^x)^-1 mod p based on the ElGamal decryption step.
     shared_secret_inverse = pow(c1, p - 1 - x, p) 
     return (c2 * shared_secret_inverse) % p
 
@@ -56,7 +56,7 @@ def text_to_numbers(message):
     numbers = []
     for char in normalized_message:
         if char not in CHAR_TO_NUMBER:
-            raise ValueError(f"Karakter tidak didukung: {char!r}")
+            raise ValueError(f"Unsupported character: {char!r}")
         numbers.append(CHAR_TO_NUMBER[char])
     return numbers
 
@@ -65,7 +65,7 @@ def numbers_to_text(numbers):
     chars = []
     for number in numbers:
         if number not in NUMBER_TO_CHAR:
-            raise ValueError(f"Angka tidak bisa dikonversi ke huruf: {number}")
+            raise ValueError(f"Number cannot be converted to a letter: {number}")
         chars.append(NUMBER_TO_CHAR[number])
     return "".join(chars)
 
@@ -131,58 +131,58 @@ def print_line(title=""):
     print("-" * width)
 
 def print_encryption_report(original_message, normalized_message, details, fixed_k=None):
-    print_line("DATA KUNCI")
+    print_line("KEY DATA")
     print(f"Public key  : p = {P}, g = {G}, y = {Y}")
     print(f"Private key : x = {X}")
     if fixed_k is None:
-        print("Nilai acak  : k berbeda untuk setiap huruf")
+        print("Random value: k is different for each letter")
     else:
-        print(f"Nilai acak  : k = {fixed_k}")
+        print(f"Random value: k = {fixed_k}")
 
-    print_line("PREPROCESSING PESAN")
-    print(f"Pesan asli                         : {original_message}")
-    print(f"Setelah uppercase dan hapus spasi  : {normalized_message}")
-    print("Konversi                           : A=0, B=1, ..., Z=25")
+    print_line("MESSAGE PREPROCESSING")
+    print(f"Original message                   : {original_message}")
+    print(f"After uppercase and removing spaces: {normalized_message}")
+    print("Conversion                         : A=0, B=1, ..., Z=25")
 
-    print_line("RUMUS ENKRIPSI ELGAMAL")
+    print_line("ELGAMAL ENCRYPTION FORMULA")
     print("a = g^k mod p")
     print("b = (y^k * m) mod p")
     print("ciphertext = (a, b)")
 
-    print_line("PERHITUNGAN UTAMA")
+    print_line("MAIN COMPUTATION")
     if fixed_k is None:
-        print("Karena k berbeda untuk setiap huruf, nilai a dan y^k mod p juga berbeda.")
-        print("Detail perhitungan ditampilkan pada tabel di bawah.")
+        print("Because k is different for each letter, a and y^k mod p are also different.")
+        print("The computation details are shown in the table below.")
     elif details:
         first = details[0]
         print(f"a = {G}^{fixed_k} mod {P} = {first['a']}")
         print(f"y^k mod p = {Y}^{fixed_k} mod {P} = {first['multiplier']}")
-        print(f"Jadi b = ({first['multiplier']} * m) mod {P}")
+        print(f"So b = ({first['multiplier']} * m) mod {P}")
 
-    print_line("TABEL ENKRIPSI")
-    print(f"{'No':>2} | {'Huruf':^5} | {'m':>2} | {'k':>4} | {'a':>4} | {'y^k mod p':>9} | {'b':>4} | {'Ciphertext (a,b)':<18}")
+    print_line("ENCRYPTION TABLE")
+    print(f"{'No':>2} | {'Letter':^6} | {'m':>2} | {'k':>4} | {'a':>4} | {'y^k mod p':>9} | {'b':>4} | {'Ciphertext (a,b)':<18}")
     print("-" * 92)
     for index, item in enumerate(details, start=1):
         ciphertext = f"({item['a']}, {item['b']})"
         print(
-            f"{index:>2} | {item['char']:^5} | {item['m']:>2} | {item['k']:>4} | "
+            f"{index:>2} | {item['char']:^6} | {item['m']:>2} | {item['k']:>4} | "
             f"{item['a']:>4} | {item['multiplier']:>9} | {item['b']:>4} | {ciphertext:<18}"
         )
 
-    print_line("DAFTAR CIPHERTEXT")
+    print_line("CIPHERTEXT LIST")
     print([item["ciphertext"] for item in details])
 
     print_block_report(details)
 
 def print_block_report(details):
-    print_line("VERSI TULISAN PER BLOK")
+    print_line("WRITTEN VERSION BY BLOCK")
     for block_index, start in enumerate(range(0, len(details), 2), start=1):
         block_items = details[start:start + 2]
         block_text = "".join(item["char"] for item in block_items)
-        print(f"\nBlok {block_index}: huruf {block_text}")
+        print(f"\nBlock {block_index}: letters {block_text}")
 
         for item in block_items:
-            print(f"\nHuruf {item['char']}:")
+            print(f"\nLetter {item['char']}:")
             print(f"m = {item['char']} = {item['m']}, k = {item['k']}")
             print(f"a = {G}^{item['k']} mod {P} = {item['a']}")
             print(f"y^k mod p = {Y}^{item['k']} mod {P} = {item['multiplier']}")
@@ -192,26 +192,26 @@ def print_block_report(details):
 def print_decryption_report(details):
     plaintext = "".join(item["char"] for item in details)
 
-    print_line("DATA KUNCI")
+    print_line("KEY DATA")
     print(f"Private key : x = {X}")
     print(f"Modulus     : p = {P}")
 
-    print_line("RUMUS DEKRIPSI ELGAMAL")
+    print_line("ELGAMAL DECRYPTION FORMULA")
     print("ciphertext = (a, b)")
     print("s = a^x mod p")
     print("s_inverse = s^(-1) mod p")
     print("m = (b * s_inverse) mod p")
-    print("Konversi hasil: A=0, B=1, ..., Z=25")
+    print("Result conversion: A=0, B=1, ..., Z=25")
 
-    print_line("HASIL DEKRIPSI")
-    print(f"Plaintext angka : {[item['m'] for item in details]}")
-    print(f"Plaintext huruf : {plaintext}")
+    print_line("DECRYPTION RESULT")
+    print(f"Plaintext numbers : {[item['m'] for item in details]}")
+    print(f"Plaintext letters : {plaintext}")
 
-    print_line("VERSI TULISAN DEKRIPSI PER BLOK")
+    print_line("WRITTEN DECRYPTION VERSION BY BLOCK")
     for block_index, start in enumerate(range(0, len(details), 2), start=1):
         block_items = details[start:start + 2]
         block_text = "".join(item["char"] for item in block_items)
-        print(f"\nBlok {block_index}: hasil huruf {block_text}")
+        print(f"\nBlock {block_index}: letter result {block_text}")
 
         for item in block_items:
             print(f"\nCiphertext {item['ciphertext']}:")
@@ -219,31 +219,31 @@ def print_decryption_report(details):
             print(f"s = {item['a']}^{X} mod {P} = {item['shared_secret']}")
             print(f"s_inverse = {item['shared_secret']}^(-1) mod {P} = {item['shared_secret_inverse']}")
             print(f"m = ({item['b']} * {item['shared_secret_inverse']}) mod {P} = {item['m']}")
-            print(f"Huruf = {item['m']} = {item['char']}")
+            print(f"Letter = {item['m']} = {item['char']}")
 
 def read_cipher_pair():
-    c1 = int(input("Masukkan c1/a: "))
-    c2 = int(input("Masukkan c2/b: "))
+    c1 = int(input("Enter c1/a: "))
+    c2 = int(input("Enter c2/b: "))
     return c1, c2
 
 def main():
     print("ElGamal Encryption and Decryption")
     print(f"Public key  : p={P}, g={G}, y={Y}")
     print(f"Private key : x={X}, p={P}\n")
-    print("Pilih menu:")
-    print("1. Enkripsi angka")
-    print("2. Dekripsi angka")
-    print("3. Enkripsi teks UTF-8")
-    print("4. Dekripsi teks UTF-8")
-    print("5. Enkripsi teks sesuai tabel A=0, ..., Z=25")
-    print("6. Dekripsi teks sesuai tabel A=0, ..., Z=25")
+    print("Choose a menu:")
+    print("1. Encrypt a number")
+    print("2. Decrypt a number")
+    print("3. Encrypt UTF-8 text")
+    print("4. Decrypt UTF-8 text")
+    print("5. Encrypt text using A=0, ..., Z=25")
+    print("6. Decrypt text using A=0, ..., Z=25")
     print()
 
-    choice = input("Pilihan: ").strip()
+    choice = input("Choice: ").strip()
 
     if choice == "1":
-        m = int(input(f"Masukkan angka m (0 sampai {P - 1}): "))
-        k_input = input("Masukkan k atau kosongkan untuk acak: ").strip()
+        m = int(input(f"Enter number m (0 to {P - 1}): "))
+        k_input = input("Enter k or leave blank for random: ").strip()
         k = int(k_input) if k_input else None
         c1, c2 = encrypt_number(m, k)
         print("\nCiphertext:")
@@ -253,38 +253,38 @@ def main():
     elif choice == "2":
         pair = read_cipher_pair()
         m = decrypt_number(pair)
-        print("\nPlaintext angka:")
+        print("\nPlaintext number:")
         print(m)
 
     elif choice == "3":
-        message = input("Masukkan pesan teks: ")
+        message = input("Enter text message: ")
         encrypted = encrypt_message(message)
-        print("\nCiphertext teks:")
+        print("\nText ciphertext:")
         print(encrypted)
 
     elif choice == "4":
-        raw_ciphertext = input("Masukkan ciphertext teks, contoh [(1, 2), (3, 4)]: ")
+        raw_ciphertext = input("Enter text ciphertext, for example [(1, 2), (3, 4)]: ")
         ciphertext = ast.literal_eval(raw_ciphertext)
         decrypted = decrypt_message(ciphertext)
-        print("\nPlaintext teks:")
+        print("\nPlaintext text:")
         print(decrypted)
 
     elif choice == "5":
-        message = input("Masukkan pesan teks A-Z: ")
-        k_input = input("Masukkan k tetap atau kosongkan supaya k acak per huruf: ").strip()
+        message = input("Enter A-Z text message: ")
+        k_input = input("Enter a fixed k or leave blank for random k per letter: ").strip()
         fixed_k = int(k_input) if k_input else None
         normalized_message = normalize_table_message(message)
         details = encrypt_table_message_details(message, fixed_k)
         print_encryption_report(message, normalized_message, details, fixed_k)
 
     elif choice == "6":
-        raw_ciphertext = input("Masukkan ciphertext, contoh [(812, 3), (812, 51)]: ")
+        raw_ciphertext = input("Enter ciphertext, for example [(812, 3), (812, 51)]: ")
         ciphertext = ast.literal_eval(raw_ciphertext)
         details = decrypt_table_message_details(ciphertext)
         print_decryption_report(details)
 
     else:
-        print("Pilihan tidak valid.")
+        print("Invalid choice.")
 
 if __name__ == "__main__":
     main()
