@@ -5,24 +5,6 @@ This project implements a simple ElGamal encryption and decryption program for a
 ## Key Data
 
 The program uses these values:
-
-```text
-p = 1009
-g = 11
-y = 510
-x = 123
-```
-
-Public key:
-
-```text
-(p, g, y) = (1009, 11, 510)
-```
-
-Private key:
-
-```text
-x = 123
 ```
 
 ## Message Preprocessing
