@@ -2,9 +2,9 @@ import ast
 from secrets import randbelow
 
 # Public key: (p, g, y)
-P = 1009
-G = 11
-Y = 510
+P = int(input("input your key: "))
+G = int(input("input your key: "))
+Y = int(input("input your key: "))
 
 # Private key: x
 X = 123
